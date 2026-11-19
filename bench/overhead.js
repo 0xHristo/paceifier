@@ -16,13 +16,14 @@ function spin(iterations) {
 	for (let i = 0; i < iterations; i++) x = (x + i * 31) % 1000003;
 	return x;
 }
-// Work per item, from almost nothing to items longer than half a slice.
+// The same callback with more and more work per item, from one multiplication
+// to longer than half a slice. The table prints the measured time per item.
 const workloads = [
-	{ name: 'trivial (x * 2)', items: 1_000_000, fn: x => x * 2 },
-	{ name: '~0.2 µs (spin 100)', items: 500_000, fn: x => spin(100) + x },
-	{ name: '~2 µs (spin 1k)', items: 100_000, fn: x => spin(1_000) + x },
-	{ name: '~40 µs (spin 10k)', items: 10_000, fn: x => spin(10_000) + x },
-	{ name: '~0.6 ms (spin 150k)', items: 500, fn: x => spin(150_000) + x },
+	{ name: 'x * 2', items: 1_000_000, fn: x => x * 2 },
+	{ name: '100-step loop', items: 500_000, fn: x => spin(100) + x },
+	{ name: '1k-step loop', items: 100_000, fn: x => spin(1_000) + x },
+	{ name: '10k-step loop', items: 10_000, fn: x => spin(10_000) + x },
+	{ name: '150k-step loop', items: 500, fn: x => spin(150_000) + x },
 ];
 
 const median = xs => xs.slice().sort((a, b) => a - b)[Math.floor(xs.length / 2)];

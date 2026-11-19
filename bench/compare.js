@@ -38,7 +38,7 @@ try {
 		return `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%`;
 	};
 	console.log(`mapPaced, ${REF} (${sha}) vs working tree, median of ${ROUNDS} rounds\n`);
-	console.log(`${'workload'.padEnd(20)} ${'time'.padStart(9)} ${'now'.padStart(10)} ${'change'.padStart(8)}   ${'p99 stall'.padStart(9)} ${'now'.padStart(8)} ${'change'.padStart(8)}`);
+	console.log(`${'callback'.padEnd(20)} ${'time'.padStart(9)} ${'now'.padStart(10)} ${'change'.padStart(8)}   ${'p99 stall'.padStart(9)} ${'now'.padStart(8)} ${'change'.padStart(8)}`);
 	runs.head[0].forEach((w, i) => {
 		const pick = (side, f) => median(runs[side].map(x => f(x[i].paced)));
 		const bt = pick('base', p => p.ms);

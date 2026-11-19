@@ -1,7 +1,11 @@
 'use strict';
-// One mapPaced over 9 items.
-const { mapPaced } = require('../..');
+// One mapPaced over 6 items.
 const { record } = require('./recorder');
-const items = Array.from({ length: 9 }, (_, i) => i);
+const { mapPaced } = require('../..');
+const items = Array.from({ length: 6 }, (_, i) => i);
 
-record(item => mapPaced(items, i => item('A', i)));
+record(async ({ start, item, done }) => {
+	start('A');
+	await mapPaced(items, i => item('A', i));
+	done('A');
+});

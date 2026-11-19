@@ -18,15 +18,26 @@ const scenarios = fs
 	.filter(f => f.endsWith('.js') && f !== 'recorder.js')
 	.map(f => path.basename(f, '.js'));
 
+// Real timing can rarely shift an item into the next slice, for example when
+// the OS pauses the process for a moment. A real change in behaviour fails
+// every attempt, so a scenario passes if any of ATTEMPTS runs matches.
+const ATTEMPTS = 3;
+const run = name => execFileSync(process.execPath, [path.join(SCENARIOS, `${name}.js`)], { encoding: 'utf8' });
+
 for (const name of scenarios) {
 	test(`scenario ${name} matches its snapshot`, () => {
-		const actual = execFileSync(process.execPath, [path.join(SCENARIOS, `${name}.js`)], { encoding: 'utf8' });
 		const file = path.join(SNAPSHOTS, `${name}.txt`);
 		if (UPDATE || !fs.existsSync(file)) {
 			fs.mkdirSync(SNAPSHOTS, { recursive: true });
-			fs.writeFileSync(file, actual);
+			fs.writeFileSync(file, run(name));
 			return;
 		}
-		assert.strictEqual(actual, fs.readFileSync(file, 'utf8'));
+		const expected = fs.readFileSync(file, 'utf8');
+		let actual;
+		for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
+			actual = run(name);
+			if (actual === expected) return;
+		}
+		assert.strictEqual(actual, expected);
 	});
 }

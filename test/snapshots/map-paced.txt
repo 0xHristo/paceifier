@@ -1,7 +1,15 @@
-turn
-A[0..2]
-turn
-A[3..5]
-turn
-A[6..8]
-done
+#1 A: start
+#1 A: items 0, 1
+#1 A: pause before item 2
+#2 io: callback
+#2 immediate: endSlice
+#2 immediate: resume A
+#2 A: items 2, 3
+#2 A: pause before item 4
+#3 io: callback
+#3 immediate: endSlice
+#3 immediate: resume A
+#3 A: items 4, 5
+#3 A: done
+#4 io: callback
+#4 immediate: endSlice

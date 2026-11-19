@@ -193,10 +193,11 @@ plain loop is faster there.
 | `npm run bench:compare [-- <ref>]` | Compares time and p99 stall of the working tree with a git ref, `main` by default |
 
 Each script in `test/scenarios/` runs paced work for real and records every step
-in the order it ran: the event-loop iteration, the phase of the loop and what
-ran. Real background work puts a callback into every phase that can run
-JavaScript, so each iteration shows the whole loop. `test/snapshots.test.js` runs every scenario in its own process and compares
-the result with `test/snapshots/<name>.txt`. For example, three `mapPaced` jobs
+in the order it ran. Each row shows the event-loop iteration, the phase of the
+loop and what ran. Real background work puts a callback into every phase that
+can run JavaScript, so each iteration shows the whole loop.
+`test/snapshots.test.js` runs every scenario in its own process and compares the
+result with `test/snapshots/<name>.txt`. For example, three `mapPaced` jobs
 of 4 items each, run with `Promise.all`:
 
 ```

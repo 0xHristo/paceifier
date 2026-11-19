@@ -1,4 +1,5 @@
 'use strict';
+// immediate() and the pacing itself, with real time and a real event loop.
 
 const test = require('node:test');
 const assert = require('node:assert');
@@ -79,7 +80,7 @@ test('an error thrown by fn rejects forEachPaced', async () => {
 	);
 });
 
-test('passes the index like forEach', async () => {
+test('forEachPaced passes the index like forEach', async () => {
 	const seen = [];
 	await forEachPaced(['a', 'b'], (v, i) => seen.push([v, i]));
 	assert.deepStrictEqual(seen, [['a', 0], ['b', 1]]);

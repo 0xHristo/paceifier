@@ -1,5 +1,5 @@
 'use strict';
-// Benchmarks the working tree against another git ref (default: main).
+// Benchmarks the working tree against another git ref, main by default.
 // Usage: npm run bench:compare [-- <ref>]
 // The base ref is checked out into a temporary git worktree, and both sides run
 // the same bench/overhead.js, alternating, ROUNDS times each.

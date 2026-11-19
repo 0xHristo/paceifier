@@ -116,8 +116,9 @@ module.exports = { record };
 
 // Turns the events into table rows. A new iteration starts whenever the phase
 // goes back in the loop's order, e.g. from close to timers. Consecutive items of
-// one job share a row, e.g. "A: items 0, 1". Pauses and resumes are worked out
-// from the order: a job followed by something other than its next item paused.
+// one job share a row, e.g. "work('a0', 0), work('a1', 1)". Pauses and resumes are
+// worked out from the order. A job followed by something other than its next
+// item paused.
 function format(events) {
 	const lines = ['loop  phase    step'];
 	let loop = 1;

@@ -1,8 +1,8 @@
 # Execution snapshots
 
 Each `.txt` file here records the order in which a scenario from
-`test/scenarios/` really ran: which steps ran, in which iteration of the Node.js
-event loop, and in which phase of that iteration. `test/snapshots.test.js` runs
+`test/scenarios/` really ran. It shows which steps ran, in which iteration of
+the Node.js event loop, and in which phase of that iteration. `test/snapshots.test.js` runs
 every scenario again and fails if the order changes.
 
 ## How to read a snapshot

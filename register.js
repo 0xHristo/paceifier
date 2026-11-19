@@ -1,6 +1,6 @@
 'use strict';
 
-// Opt-in: adds the …Paced methods to Array.prototype and Iterator.prototype
+// Opt-in. Adds the …Paced methods to Array.prototype and Iterator.prototype
 // (Node 22+), as non-enumerable methods, only where they are missing.
 const methods = require('./lib/methods');
 

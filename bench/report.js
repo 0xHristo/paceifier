@@ -1,5 +1,5 @@
 'use strict';
-// Prints overhead.js results as three tables: time, stalls and memory.
+// Prints overhead.js results as three tables, for time, stalls and memory.
 const n = (x, d = 1) => x.toFixed(d);
 // Time one item takes in the blocking run, e.g. "4.2 µs" or "0.59 ms".
 function perItem(r) {

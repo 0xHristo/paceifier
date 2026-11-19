@@ -40,12 +40,18 @@
 		"node": ">=22"
 	},
 	"keywords": [
-		"paced",
 		"event-loop",
 		"non-blocking",
-		"yield",
+		"blocking",
+		"cpu",
+		"responsiveness",
 		"setImmediate",
-		"chunk"
+		"async",
+		"iterator",
+		"map",
+		"forEach",
+		"deno",
+		"bun"
 	],
 	"license": "Apache-2.0"
 }

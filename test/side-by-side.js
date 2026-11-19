@@ -1,6 +1,6 @@
 'use strict';
 // Puts two snapshots next to each other, lined up by event-loop iteration and
-// phase: rows that ran in the same loop and phase share a block, and the shorter
+// phase. Rows that ran in the same loop and phase share a block, and the shorter
 // side of a block is padded with empty rows.
 const PHASES = ['timers', 'pending', 'poll', 'check', 'close'];
 

@@ -271,6 +271,22 @@ shows that wrapping every item in a promise doesn't help either, next to
 shows that `Promise.all(await mapPaced(values, async work))` runs in exactly the
 same order as `mapPaced(values, work)`.
 
+## Background
+
+paceifier started from a proposal to stop metric export in prom-client from
+blocking the event loop during a scrape.
+
+- [prometheus/client_js#877](https://github.com/prometheus/client_js/issues/877)
+  is the original issue, which proposes yielding the event loop during metric
+  export.
+- [prometheus/client_js#878](https://github.com/prometheus/client_js/pull/878)
+  is the pull request that implements it.
+- [The review comment about 64 histograms](https://github.com/prometheus/client_js/pull/878#discussion_r4606381195)
+  asks what happens when the export itself takes about a millisecond. That
+  question led to the slice design here. The time is measured from the start
+  of each slice, so long work keeps pausing every 1 ms no matter how much of it
+  there is.
+
 ## License
 
 Apache-2.0

@@ -17,7 +17,7 @@ thread busy until it finishes. Meanwhile the process can't answer requests,
 read sockets or run timers, so every other task on the service waits.
 
 paceifier splits that one long block into slices. You run the work through a
-`…Paced` method, or call `immediate()` in your own loop and await it when it
+`…Paced` method, or call `pace()` in your own loop and await it when it
 returns a promise. Each slice runs for about 1 ms, then the event loop gets a
 full turn to handle everything else that is waiting.
 
@@ -86,20 +86,20 @@ If `fn` throws, the promise rejects.
 argument) to `Array.prototype` and `Iterator.prototype` (Node 22+). They are
 non-enumerable and only added where they don't already exist.
 
-`immediate()` is the low-level check. It returns `undefined` while the slice has
+`pace()` is the low-level check. It returns `undefined` while the slice has
 time left, or a promise to await before doing more work.
 
 ```js
-const { immediate } = require('paceifier');
+const { pace } = require('paceifier');
 
 for (const item of items) {
-	const pause = immediate();
+	const pause = pace();
 	if (pause) await pause;
 	work(item);
 }
 ```
 
-Await the promise from `immediate()` directly, as above. Wrapping it in another
+Await the promise from `pace()` directly, as above. Wrapping it in another
 async function delays the caller by extra microtasks, and the slice can then
 overrun.
 
@@ -120,7 +120,7 @@ On older runtimes (Node 18 and 20, Bun 1.0 and 1.1) everything works except the
 
 ## How it works
 
-- Work runs in slices of about 1 ms. The first call to `immediate()` starts a
+- Work runs in slices of about 1 ms. The first call to `pace()` starts a
   slice, notes the time and schedules a callback with `setImmediate` that will
   end the slice.
 - Each later call checks the clock. While the slice has time left, it returns
@@ -211,11 +211,11 @@ of 4 items each, run with `Promise.all`:
 loop  phase    step
 #1    timers   mapPaced(['a0', 'a1', 'a2', 'a3'], work)
 #1    timers   work('a0', 0), work('a1', 1)
-#1    timers   await immediate(), paused before work('a2', 2)
+#1    timers   await pace(), paused before work('a2', 2)
 #1    timers   mapPaced(['b0', 'b1', 'b2', 'b3'], work)
-#1    timers   await immediate(), paused before work('b0', 0)
+#1    timers   await pace(), paused before work('b0', 0)
 #1    timers   mapPaced(['c0', 'c1', 'c2', 'c3'], work)
-#1    timers   await immediate(), paused before work('c0', 0)
+#1    timers   await pace(), paused before work('c0', 0)
 #1    timers   setTimeout callback
 #1    pending  net.connect 'error' event
 #1    poll     fs.stat callback
@@ -234,7 +234,7 @@ loop  phase    step
 #2    check    endSlice()
 #2    check    resumeNext() resumes work('b0', 0)
 #2    check    work('b0', 0), work('b1', 1)
-#2    check    await immediate(), paused before work('b2', 2)
+#2    check    await pace(), paused before work('b2', 2)
 #2    close    net.connect 'close' event
 #3    timers   setTimeout callback
 #3    pending  net.connect 'error' event
@@ -244,7 +244,7 @@ loop  phase    step
 #3    check    endSlice()
 #3    check    resumeNext() resumes work('c0', 0)
 #3    check    work('c0', 0), work('c1', 1)
-#3    check    await immediate(), paused before work('c2', 2)
+#3    check    await pace(), paused before work('c2', 2)
 #3    close    net.connect 'close' event
 #4    timers   setTimeout callback
 #4    pending  net.connect 'error' event

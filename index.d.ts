@@ -9,12 +9,12 @@ type Fn<T, R> = (item: T, index: number) => R;
  *
  * @example
  * for (const item of items) {
- * 	const pause = immediate();
+ * 	const pause = pace();
  * 	if (pause) await pause;
  * 	work(item);
  * }
  */
-export function immediate(): Promise<void> | undefined;
+export function pace(): Promise<void> | undefined;
 
 /**
  * Calls `fn` for every item, pausing for an event-loop turn about every 1 ms.

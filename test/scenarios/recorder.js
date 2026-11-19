@@ -37,7 +37,7 @@ const realSetImmediate = timers.setImmediate;
 timers.setImmediate = (cb, ...args) =>
 	realSetImmediate(() => {
 		phase = 'check';
-		push({ kind: 'immediate', name: cb.name || 'callback' });
+		push({ kind: 'setImmediate', name: cb.name || 'callback' });
 		cb(...args);
 	});
 
@@ -134,11 +134,11 @@ function format(events) {
 	for (let i = 0; i < events.length; i++) {
 		const e = events[i];
 		if (e.kind === 'step') add(e, e.text);
-		if (e.kind === 'immediate') add(e, `${e.name}()`);
+		if (e.kind === 'setImmediate') add(e, `${e.name}()`);
 		if (e.kind === 'start') add(e, e.call);
 		if (e.kind === 'done') add(e, e.text);
 		if (e.kind === 'start' && events[i + 1]?.job !== e.job) {
-			add(e, `await immediate(), paused before ${call(events.slice(i + 1).find(x => x.job === e.job))}`);
+			add(e, `await pace(), paused before ${call(events.slice(i + 1).find(x => x.job === e.job))}`);
 			paused.add(e.job);
 		}
 		if (e.kind === 'item') {
@@ -150,12 +150,12 @@ function format(events) {
 			add(e, events.slice(i, j + 1).map(call).join(', '));
 			const next = events.slice(j + 1).find(x => x.job === e.job);
 			if (next?.kind === 'item' && events[j + 1] !== next) {
-				add(events[j], `await immediate(), paused before ${call(next)}`);
+				add(events[j], `await pace(), paused before ${call(next)}`);
 				paused.add(e.job);
 			}
 			i = j;
 		}
-		lastWasEndSlice = e.kind === 'immediate' && e.name === 'endSlice';
+		lastWasEndSlice = e.kind === 'setImmediate' && e.name === 'endSlice';
 	}
 	return lines.join('\n') + '\n';
 }

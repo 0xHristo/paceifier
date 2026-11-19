@@ -1,9 +1,9 @@
 loop  phase    step
 #1    timers   mapPaced(['a0', 'a1', 'a2'], work)
 #1    timers   work('a0', 0), work('a1', 1)
-#1    timers   await immediate(), paused before work('a2', 2)
+#1    timers   await pace(), paused before work('a2', 2)
 #1    timers   mapPaced(['b0', 'b1', 'b2'], work)
-#1    timers   await immediate(), paused before work('b0', 0)
+#1    timers   await pace(), paused before work('b0', 0)
 #1    timers   setTimeout callback
 #1    pending  net.connect 'error' event
 #1    poll     fs.stat callback
@@ -14,7 +14,7 @@ loop  phase    step
 #1    check    work('a2', 2)
 #1    check    resumeNext() resumes work('b0', 0) in a microtask
 #1    check    work('b0', 0)
-#1    check    await immediate(), paused before work('b1', 1)
+#1    check    await pace(), paused before work('b1', 1)
 #1    check    mapPaced(['a0', 'a1', 'a2'], work) resolved
 #1    close    net.connect 'close' event
 #2    timers   setTimeout callback

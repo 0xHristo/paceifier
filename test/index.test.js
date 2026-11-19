@@ -1,9 +1,9 @@
 'use strict';
-// immediate() and the pacing itself, with real time and a real event loop.
+// pace() and the pacing itself, with real time and a real event loop.
 
 const test = require('node:test');
 const assert = require('node:assert');
-const { immediate, forEachPaced } = require('..');
+const { pace, forEachPaced } = require('..');
 
 const tick = () => new Promise(resolve => setImmediate(resolve));
 
@@ -12,9 +12,9 @@ function busy(ms) {
 	while (performance.now() < end);
 }
 
-test('immediate returns undefined at the start of a slice', async () => {
+test('pace returns undefined at the start of a slice', async () => {
 	await tick();
-	assert.strictEqual(immediate(), undefined);
+	assert.strictEqual(pace(), undefined);
 });
 
 test('forEachPaced calls fn for every item in order, from any iterable', async () => {

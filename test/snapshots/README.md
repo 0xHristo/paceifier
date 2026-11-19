@@ -14,9 +14,9 @@ This is `handoff.txt`, with two `mapPaced` jobs of 3 items each. Job A works on
 loop  phase    step
 #1    timers   mapPaced(['a0', 'a1', 'a2'], work)
 #1    timers   work('a0', 0), work('a1', 1)
-#1    timers   await immediate(), paused before work('a2', 2)
+#1    timers   await pace(), paused before work('a2', 2)
 #1    timers   mapPaced(['b0', 'b1', 'b2'], work)
-#1    timers   await immediate(), paused before work('b0', 0)
+#1    timers   await pace(), paused before work('b0', 0)
 #1    timers   setTimeout callback
 #1    pending  net.connect 'error' event
 #1    poll     fs.stat callback
@@ -27,7 +27,7 @@ loop  phase    step
 #1    check    work('a2', 2)
 #1    check    resumeNext() resumes work('b0', 0) in a microtask
 #1    check    work('b0', 0)
-#1    check    await immediate(), paused before work('b1', 1)
+#1    check    await pace(), paused before work('b1', 1)
 #1    check    mapPaced(['a0', 'a1', 'a2'], work) resolved
 #1    close    net.connect 'close' event
 #2    timers   setTimeout callback
@@ -92,7 +92,7 @@ so every row shows which job it belongs to.
 |---|---|
 | `mapPaced(['a0', 'a1', 'a2'], work)` | Job A called `mapPaced` with its items and the callback `work` |
 | `work('a0', 0), work('a1', 1)` | `mapPaced` called `work(value, index)` for `'a0'` and `'a1'`, back to back without a pause |
-| `await immediate(), paused before work('a2', 2)` | The slice ran out. paceifier's `immediate()` returned a promise, `mapPaced` awaits it, and `work('a2', 2)` is the next call once job A resumes |
+| `await pace(), paused before work('a2', 2)` | The slice ran out. paceifier's `pace()` returned a promise, `mapPaced` awaits it, and `work('a2', 2)` is the next call once job A resumes |
 | `endSlice()` | paceifier's `setImmediate` callback ended the slice and started a new one |
 | `resumeNext() resumes work('a2', 2)` | `endSlice()` called `resumeNext()`, which resumed the first paused job. Its next call follows |
 | `resumeNext() resumes work('b0', 0) in a microtask` | A job resumed in the same slice, because the job before it finished with time left |

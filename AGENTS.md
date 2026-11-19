@@ -10,8 +10,8 @@ JavaScript with hand-written type declarations.
 
 | Path | Contents |
 |---|---|
-| `lib/slice.js` | `immediate()`, the slice timer and the queue of waiting callers |
-| `lib/methods.js` | The `…Paced` methods, all built on `immediate()` |
+| `lib/slice.js` | `pace()`, the slice timer and the queue of waiting callers |
+| `lib/methods.js` | The `…Paced` methods, all built on `pace()` |
 | `index.js`, `index.d.ts` | The public exports and their types |
 | `register.js`, `register.d.ts` | The opt-in methods on `Array.prototype` and `Iterator.prototype` |
 | `test/` | Unit tests, execution snapshots and runtime checks |
@@ -35,7 +35,7 @@ JavaScript with hand-written type declarations.
   the named exports.
 - Callbacks are synchronous and get `(item, index)`. Every method takes any
   iterable and returns a promise.
-- Await the promise from `immediate()` directly. `resumeNext()` in
+- Await the promise from `pace()` directly. `resumeNext()` in
   `lib/slice.js` relies on it to hand the rest of a slice to the next caller.
 - Don't fake timers or the clock in tests. The snapshot scenarios in
   `test/scenarios/` run for real, and the snapshots contain no times.

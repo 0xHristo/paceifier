@@ -2,11 +2,11 @@ Promise.all with a promise per item                                            |
 loop  phase    step                                                            | loop  phase    step
 #1    timers   Promise.all(['a0', 'a1', 'a2', 'a3'].map(async work))           | #1    timers   forEachPaced(['a0', 'a1', 'a2', 'a3'], work)
 #1    timers   work('a0', 0), work('a1', 1), work('a2', 2), work('a3', 3)      | #1    timers   work('a0', 0), work('a1', 1)
-#1    timers   Promise.all(['b0', 'b1', 'b2', 'b3'].map(async work))           | #1    timers   await immediate(), paused before work('a2', 2)
+#1    timers   Promise.all(['b0', 'b1', 'b2', 'b3'].map(async work))           | #1    timers   await pace(), paused before work('a2', 2)
 #1    timers   work('b0', 0), work('b1', 1), work('b2', 2), work('b3', 3)      | #1    timers   forEachPaced(['b0', 'b1', 'b2', 'b3'], work)
-#1    timers   Promise.all(['c0', 'c1', 'c2', 'c3'].map(async work))           | #1    timers   await immediate(), paused before work('b0', 0)
+#1    timers   Promise.all(['c0', 'c1', 'c2', 'c3'].map(async work))           | #1    timers   await pace(), paused before work('b0', 0)
 #1    timers   work('c0', 0), work('c1', 1), work('c2', 2), work('c3', 3)      | #1    timers   forEachPaced(['c0', 'c1', 'c2', 'c3'], work)
-#1    timers   Promise.all(['a0', 'a1', 'a2', 'a3'].map(async work)) resolved  | #1    timers   await immediate(), paused before work('c0', 0)
+#1    timers   Promise.all(['a0', 'a1', 'a2', 'a3'].map(async work)) resolved  | #1    timers   await pace(), paused before work('c0', 0)
 #1    timers   Promise.all(['b0', 'b1', 'b2', 'b3'].map(async work)) resolved  | #1    timers   setTimeout callback
 #1    timers   Promise.all(['c0', 'c1', 'c2', 'c3'].map(async work)) resolved  |
 #1    timers   setTimeout callback                                             |
@@ -27,7 +27,7 @@ loop  phase    step                                                            |
                                                                                | #2    check    endSlice()
                                                                                | #2    check    resumeNext() resumes work('b0', 0)
                                                                                | #2    check    work('b0', 0), work('b1', 1)
-                                                                               | #2    check    await immediate(), paused before work('b2', 2)
+                                                                               | #2    check    await pace(), paused before work('b2', 2)
                                                                                | #2    close    net.connect 'close' event
                                                                                | #3    timers   setTimeout callback
                                                                                | #3    pending  net.connect 'error' event
@@ -37,7 +37,7 @@ loop  phase    step                                                            |
                                                                                | #3    check    endSlice()
                                                                                | #3    check    resumeNext() resumes work('c0', 0)
                                                                                | #3    check    work('c0', 0), work('c1', 1)
-                                                                               | #3    check    await immediate(), paused before work('c2', 2)
+                                                                               | #3    check    await pace(), paused before work('c2', 2)
                                                                                | #3    close    net.connect 'close' event
                                                                                | #4    timers   setTimeout callback
                                                                                | #4    pending  net.connect 'error' event

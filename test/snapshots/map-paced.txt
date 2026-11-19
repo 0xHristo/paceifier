@@ -1,7 +1,7 @@
 loop  phase    step
 #1    timers   mapPaced(['a0', 'a1', 'a2', 'a3', 'a4', 'a5'], work)
 #1    timers   work('a0', 0), work('a1', 1)
-#1    timers   await immediate(), paused before work('a2', 2)
+#1    timers   await pace(), paused before work('a2', 2)
 #1    timers   setTimeout callback
 #1    pending  net.connect 'error' event
 #1    poll     fs.stat callback
@@ -10,7 +10,7 @@ loop  phase    step
 #1    check    endSlice()
 #1    check    resumeNext() resumes work('a2', 2)
 #1    check    work('a2', 2), work('a3', 3)
-#1    check    await immediate(), paused before work('a4', 4)
+#1    check    await pace(), paused before work('a4', 4)
 #1    close    net.connect 'close' event
 #2    timers   setTimeout callback
 #2    pending  net.connect 'error' event

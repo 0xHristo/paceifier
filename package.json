@@ -19,7 +19,10 @@
 		"lib"
 	],
 	"scripts": {
-		"test": "node --test"
+		"test": "node --test --test-concurrency=1 'test/*.test.js'",
+		"bench": "node --expose-gc bench/overhead.js",
+		"bench:compare": "node bench/compare.js",
+		"test:update": "UPDATE_SNAPSHOTS=1 node --test --test-concurrency=1 'test/*.test.js'"
 	},
 	"engines": {
 		"node": ">=18"

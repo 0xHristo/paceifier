@@ -1,0 +1,7 @@
+turn
+A[0..2]
+turn
+A[3..5]
+turn
+A[6..8]
+done

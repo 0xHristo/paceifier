@@ -27,6 +27,14 @@ about 7 times slower. With items that take a few microseconds or more, it is
 only 2 to 5% slower (see [Performance](#performance)). In exchange, the service
 stays responsive and can keep handling other work while the job runs.
 
+paceifier follows the *partitioning* approach from the Node.js guide
+[Don't Block the Event Loop (or the Worker Pool)](https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop#partitioning).
+The guide splits a long calculation into small steps and schedules each one with
+`setImmediate`. paceifier does the same, but it pauses by time instead of after
+every step, so each turn of the event loop runs about 1 ms of work. For complex
+work the guide recommends *offloading* to a worker instead, which matches
+[When not to use it](#when-not-to-use-it).
+
 ### When to use it
 
 - Long loops on a server, where one job must not delay other requests.

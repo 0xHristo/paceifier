@@ -5,10 +5,10 @@
 	"author": "hristoht",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/0xHristo/paced.git"
+		"url": "git+https://github.com/0xHristo/paceifier.git"
 	},
-	"homepage": "https://github.com/0xHristo/paced#readme",
-	"bugs": "https://github.com/0xHristo/paced/issues",
+	"homepage": "https://github.com/0xHristo/paceifier#readme",
+	"bugs": "https://github.com/0xHristo/paceifier/issues",
 	"main": "index.js",
 	"types": "index.d.ts",
 	"files": [

@@ -1,10 +1,10 @@
 loop  phase    step
-#1    timers   A: start
-#1    timers   A: items 0, 1, 2, 3, 4, 5
-#1    timers   A: done
-#1    timers   timeout: callback
-#1    pending  socket: connect error
-#1    poll     io: callback
-#1    poll     nextTick: callback
-#1    poll     microtask: callback
-#1    close    socket: closed
+#1    timers   ['a0', 'a1', 'a2', 'a3', 'a4', 'a5'].map(work)
+#1    timers   work('a0', 0), work('a1', 1), work('a2', 2), work('a3', 3), work('a4', 4), work('a5', 5)
+#1    timers   ['a0', 'a1', 'a2', 'a3', 'a4', 'a5'].map(work) returned
+#1    timers   setTimeout callback
+#1    pending  net.connect 'error' event
+#1    poll     fs.stat callback
+#1    poll     process.nextTick callback
+#1    poll     queueMicrotask callback
+#1    close    net.connect 'close' event

@@ -1,29 +1,29 @@
 loop  phase    step
-#1    timers   A: start
-#1    timers   A: items 0, 1
-#1    timers   A: pause before item 2
-#1    timers   B: start
-#1    timers   B: pause before item 0
-#1    timers   timeout: callback
-#1    pending  socket: connect error
-#1    poll     io: callback
-#1    poll     nextTick: callback
-#1    poll     microtask: callback
-#1    check    immediate: endSlice
-#1    check    immediate: resume A
-#1    check    A: item 2
-#1    check    microtask: resume B
-#1    check    B: item 0
-#1    check    B: pause before item 1
-#1    check    A: done
-#1    close    socket: closed
-#2    timers   timeout: callback
-#2    pending  socket: connect error
-#2    poll     io: callback
-#2    poll     nextTick: callback
-#2    poll     microtask: callback
-#2    check    immediate: endSlice
-#2    check    immediate: resume B
-#2    check    B: items 1, 2
-#2    check    B: done
-#2    close    socket: closed
+#1    timers   mapPaced(['a0', 'a1', 'a2'], work)
+#1    timers   work('a0', 0), work('a1', 1)
+#1    timers   await immediate(), paused before work('a2', 2)
+#1    timers   mapPaced(['b0', 'b1', 'b2'], work)
+#1    timers   await immediate(), paused before work('b0', 0)
+#1    timers   setTimeout callback
+#1    pending  net.connect 'error' event
+#1    poll     fs.stat callback
+#1    poll     process.nextTick callback
+#1    poll     queueMicrotask callback
+#1    check    endSlice()
+#1    check    resumeNext() resumes work('a2', 2)
+#1    check    work('a2', 2)
+#1    check    resumeNext() resumes work('b0', 0) in a microtask
+#1    check    work('b0', 0)
+#1    check    await immediate(), paused before work('b1', 1)
+#1    check    mapPaced(['a0', 'a1', 'a2'], work) resolved
+#1    close    net.connect 'close' event
+#2    timers   setTimeout callback
+#2    pending  net.connect 'error' event
+#2    poll     fs.stat callback
+#2    poll     process.nextTick callback
+#2    poll     queueMicrotask callback
+#2    check    endSlice()
+#2    check    resumeNext() resumes work('b1', 1)
+#2    check    work('b1', 1), work('b2', 2)
+#2    check    mapPaced(['b0', 'b1', 'b2'], work) resolved
+#2    close    net.connect 'close' event

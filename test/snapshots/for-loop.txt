@@ -1,58 +1,58 @@
 loop  phase    step
-#1    timers   A: start
-#1    timers   A: items 0, 1
-#1    timers   A: pause before item 2
-#1    timers   timeout: callback
-#1    pending  socket: connect error
-#1    poll     io: callback
-#1    poll     nextTick: callback
-#1    poll     microtask: callback
-#1    check    immediate: endSlice
-#1    check    immediate: resume A
-#1    check    A: items 2, 3
-#1    check    A: done
-#1    check    B: start
-#1    check    B: pause before item 0
-#1    close    socket: closed
-#2    timers   timeout: callback
-#2    pending  socket: connect error
-#2    poll     io: callback
-#2    poll     nextTick: callback
-#2    poll     microtask: callback
-#2    check    immediate: endSlice
-#2    check    immediate: resume B
-#2    check    B: items 0, 1
-#2    check    B: pause before item 2
-#2    close    socket: closed
-#3    timers   timeout: callback
-#3    pending  socket: connect error
-#3    poll     io: callback
-#3    poll     nextTick: callback
-#3    poll     microtask: callback
-#3    check    immediate: endSlice
-#3    check    immediate: resume B
-#3    check    B: items 2, 3
-#3    check    B: done
-#3    check    C: start
-#3    check    C: pause before item 0
-#3    close    socket: closed
-#4    timers   timeout: callback
-#4    pending  socket: connect error
-#4    poll     io: callback
-#4    poll     nextTick: callback
-#4    poll     microtask: callback
-#4    check    immediate: endSlice
-#4    check    immediate: resume C
-#4    check    C: items 0, 1
-#4    check    C: pause before item 2
-#4    close    socket: closed
-#5    timers   timeout: callback
-#5    pending  socket: connect error
-#5    poll     io: callback
-#5    poll     nextTick: callback
-#5    poll     microtask: callback
-#5    check    immediate: endSlice
-#5    check    immediate: resume C
-#5    check    C: items 2, 3
-#5    check    C: done
-#5    close    socket: closed
+#1    timers   mapPaced(['a0', 'a1', 'a2', 'a3'], work)
+#1    timers   work('a0', 0), work('a1', 1)
+#1    timers   await immediate(), paused before work('a2', 2)
+#1    timers   setTimeout callback
+#1    pending  net.connect 'error' event
+#1    poll     fs.stat callback
+#1    poll     process.nextTick callback
+#1    poll     queueMicrotask callback
+#1    check    endSlice()
+#1    check    resumeNext() resumes work('a2', 2)
+#1    check    work('a2', 2), work('a3', 3)
+#1    check    mapPaced(['a0', 'a1', 'a2', 'a3'], work) resolved
+#1    check    mapPaced(['b0', 'b1', 'b2', 'b3'], work)
+#1    check    await immediate(), paused before work('b0', 0)
+#1    close    net.connect 'close' event
+#2    timers   setTimeout callback
+#2    pending  net.connect 'error' event
+#2    poll     fs.stat callback
+#2    poll     process.nextTick callback
+#2    poll     queueMicrotask callback
+#2    check    endSlice()
+#2    check    resumeNext() resumes work('b0', 0)
+#2    check    work('b0', 0), work('b1', 1)
+#2    check    await immediate(), paused before work('b2', 2)
+#2    close    net.connect 'close' event
+#3    timers   setTimeout callback
+#3    pending  net.connect 'error' event
+#3    poll     fs.stat callback
+#3    poll     process.nextTick callback
+#3    poll     queueMicrotask callback
+#3    check    endSlice()
+#3    check    resumeNext() resumes work('b2', 2)
+#3    check    work('b2', 2), work('b3', 3)
+#3    check    mapPaced(['b0', 'b1', 'b2', 'b3'], work) resolved
+#3    check    mapPaced(['c0', 'c1', 'c2', 'c3'], work)
+#3    check    await immediate(), paused before work('c0', 0)
+#3    close    net.connect 'close' event
+#4    timers   setTimeout callback
+#4    pending  net.connect 'error' event
+#4    poll     fs.stat callback
+#4    poll     process.nextTick callback
+#4    poll     queueMicrotask callback
+#4    check    endSlice()
+#4    check    resumeNext() resumes work('c0', 0)
+#4    check    work('c0', 0), work('c1', 1)
+#4    check    await immediate(), paused before work('c2', 2)
+#4    close    net.connect 'close' event
+#5    timers   setTimeout callback
+#5    pending  net.connect 'error' event
+#5    poll     fs.stat callback
+#5    poll     process.nextTick callback
+#5    poll     queueMicrotask callback
+#5    check    endSlice()
+#5    check    resumeNext() resumes work('c2', 2)
+#5    check    work('c2', 2), work('c3', 3)
+#5    check    mapPaced(['c0', 'c1', 'c2', 'c3'], work) resolved
+#5    close    net.connect 'close' event

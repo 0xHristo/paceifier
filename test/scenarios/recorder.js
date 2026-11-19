@@ -46,7 +46,7 @@ function background() {
 		setTimeout(() => {
 			if (!running) return;
 			phase = 'timers';
-			push({ kind: 'step', text: 'timeout: callback' });
+			push({ kind: 'step', text: 'setTimeout callback' });
 			timeout();
 		}, 0);
 	})();
@@ -54,9 +54,9 @@ function background() {
 		fs.stat(__filename, () => {
 			if (!running) return;
 			phase = 'poll';
-			push({ kind: 'step', text: 'io: callback' });
-			process.nextTick(() => push({ kind: 'step', text: 'nextTick: callback' }));
-			queueMicrotask(() => push({ kind: 'step', text: 'microtask: callback' }));
+			push({ kind: 'step', text: 'fs.stat callback' });
+			process.nextTick(() => push({ kind: 'step', text: 'process.nextTick callback' }));
+			queueMicrotask(() => push({ kind: 'step', text: 'queueMicrotask callback' }));
 			io();
 		});
 	})();
@@ -64,12 +64,12 @@ function background() {
 		const socket = net.connect(MISSING_SOCKET);
 		socket.on('error', () => {
 			phase = 'pending';
-			push({ kind: 'step', text: 'socket: connect error' });
+			push({ kind: 'step', text: "net.connect 'error' event" });
 		});
 		socket.on('close', () => {
 			if (!running) return;
 			phase = 'close';
-			push({ kind: 'step', text: 'socket: closed' });
+			push({ kind: 'step', text: "net.connect 'close' event" });
 			onClose?.();
 			connect();
 		});
@@ -81,13 +81,17 @@ function busy(ms) {
 	while (performance.now() < end);
 }
 
+// Hooks the scenarios call. start and done describe the call that starts and
+// ends a job, e.g. "mapPaced(['a0', 'a1'], work)"; item records one call of
+// the job's callback, work(value, index).
 const hooks = {
-	start: job => push({ kind: 'start', job }),
-	item: (job, index) => {
-		push({ kind: 'item', job, index });
+	start: (job, call) => push({ kind: 'start', job, call }),
+	item: (job, value, index) => {
+		push({ kind: 'item', job, value, index });
 		busy(ITEM_MS);
 	},
-	done: job => push({ kind: 'done', job }),
+	done: (job, text) => push({ kind: 'done', job, text }),
+	items: (job, n) => Array.from({ length: n }, (_, i) => `${job.toLowerCase()}${i}`),
 };
 
 function record(scenario) {
@@ -129,24 +133,23 @@ function format(events) {
 	for (let i = 0; i < events.length; i++) {
 		const e = events[i];
 		if (e.kind === 'step') add(e, e.text);
-		if (e.kind === 'immediate') add(e, `immediate: ${e.name}`);
-		if (e.kind === 'start') add(e, `${e.job}: start`);
-		if (e.kind === 'done') add(e, `${e.job}: done`);
+		if (e.kind === 'immediate') add(e, `${e.name}()`);
+		if (e.kind === 'start') add(e, e.call);
+		if (e.kind === 'done') add(e, e.text);
 		if (e.kind === 'start' && events[i + 1]?.job !== e.job) {
-			add(e, `${e.job}: pause before item 0`);
+			add(e, `await immediate(), paused before ${call(events.slice(i + 1).find(x => x.job === e.job))}`);
 			paused.add(e.job);
 		}
 		if (e.kind === 'item') {
 			if (paused.delete(e.job)) {
-				add(e, lastWasEndSlice ? `immediate: resume ${e.job}` : `microtask: resume ${e.job}`);
+				add(e, lastWasEndSlice ? `resumeNext() resumes ${call(e)}` : `resumeNext() resumes ${call(e)} in a microtask`);
 			}
 			let j = i;
 			while (events[j + 1]?.kind === 'item' && events[j + 1].job === e.job) j++;
-			const indexes = events.slice(i, j + 1).map(x => x.index);
-			add(e, `${e.job}: ${indexes.length > 1 ? 'items' : 'item'} ${indexes.join(', ')}`);
+			add(e, events.slice(i, j + 1).map(call).join(', '));
 			const next = events.slice(j + 1).find(x => x.job === e.job);
 			if (next?.kind === 'item' && events[j + 1] !== next) {
-				add(events[j], `${e.job}: pause before item ${next.index}`);
+				add(events[j], `await immediate(), paused before ${call(next)}`);
 				paused.add(e.job);
 			}
 			i = j;
@@ -155,3 +158,5 @@ function format(events) {
 	}
 	return lines.join('\n') + '\n';
 }
+
+const call = e => `work('${e.value}', ${e.index})`;

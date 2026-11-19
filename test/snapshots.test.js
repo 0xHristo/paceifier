@@ -6,6 +6,7 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const { execFileSync } = require('node:child_process');
+const { sideBySide } = require('./side-by-side');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -41,3 +42,49 @@ for (const name of scenarios) {
 		assert.strictEqual(actual, expected);
 	});
 }
+
+// Side-by-side views, built from two of the snapshots above.
+const COMPARISONS = [
+	{
+		name: 'promise-all-side-by-side',
+		left: ['Promise.all with Array.map', 'promise-all-array-map'],
+		right: ['Promise.all with mapPaced', 'promise-all'],
+	},
+	{
+		name: 'promise-all-async-map-side-by-side',
+		left: ['Promise.all with a promise per item', 'promise-all-async-map'],
+		right: ['Promise.all with forEachPaced', 'promise-all-for-each-paced'],
+	},
+	{
+		name: 'map-paced-vs-promise-all-side-by-side',
+		left: ['mapPaced(values, work)', 'promise-all'],
+		right: ['Promise.all(await mapPaced(values, async work))', 'promise-all-async-map-paced'],
+	},
+];
+
+for (const c of COMPARISONS) {
+	test(`${c.name} matches the snapshots it is built from`, () => {
+		const read = name => fs.readFileSync(path.join(SNAPSHOTS, `${name}.txt`), 'utf8');
+		const actual = sideBySide(c.left[0], read(c.left[1]), c.right[0], read(c.right[1]));
+		const file = path.join(SNAPSHOTS, `${c.name}.txt`);
+		if (UPDATE || !fs.existsSync(file)) return fs.writeFileSync(file, actual);
+		assert.strictEqual(actual, fs.readFileSync(file, 'utf8'));
+	});
+}
+
+// mapPaced with a plain callback and Promise.all over mapPaced with an async
+// callback must run in exactly the same order. This runs both scenarios live and
+// compares their output, after rewriting only the text of the call that starts
+// and ends each job. Real timing can rarely shift an item, so it retries.
+test('Promise.all(await mapPaced(values, async work)) runs like mapPaced(values, work)', () => {
+	const asPlainMapPaced = text =>
+		text.replace(/Promise\.all\(await mapPaced\((\[[^\]]*\]), async work\)\)/g, 'mapPaced($1, work)');
+	let plain;
+	let wrapped;
+	for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
+		plain = run('promise-all');
+		wrapped = asPlainMapPaced(run('promise-all-async-map-paced'));
+		if (wrapped === plain) return;
+	}
+	assert.strictEqual(wrapped, plain);
+});

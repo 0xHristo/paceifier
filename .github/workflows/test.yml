@@ -1,0 +1,53 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # 22 is the oldest Node LTS that is still supported.
+        node: [22, 24, 26]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+      - run: test/runtimes/run.sh node
+
+  deno:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # 2.9 is the only supported Deno LTS.
+        deno: ['2.9', 'v2.x']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ matrix.deno }}
+      - run: test/runtimes/run.sh deno
+
+  bun:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Bun has no LTS. 1.2 is the first version with Iterator.prototype.
+        bun: ['1.2.0', latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ matrix.bun }}
+      - run: test/runtimes/run.sh bun

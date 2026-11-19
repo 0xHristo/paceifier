@@ -10,7 +10,19 @@
 	"homepage": "https://github.com/0xHristo/paceifier#readme",
 	"bugs": "https://github.com/0xHristo/paceifier/issues",
 	"main": "index.js",
+	"type": "commonjs",
 	"types": "index.d.ts",
+	"exports": {
+		".": {
+			"types": "./index.d.ts",
+			"default": "./index.js"
+		},
+		"./register": {
+			"types": "./register.d.ts",
+			"default": "./register.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"files": [
 		"index.js",
 		"index.d.ts",
@@ -25,7 +37,7 @@
 		"test:update": "UPDATE_SNAPSHOTS=1 node --test --test-concurrency=1 'test/*.test.js'"
 	},
 	"engines": {
-		"node": ">=18"
+		"node": ">=22"
 	},
 	"keywords": [
 		"paced",

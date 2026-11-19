@@ -1,3 +1,17 @@
 'use strict';
 
-module.exports = { ...require('./lib/slice'), ...require('./lib/methods') };
+// Each export is assigned on its own line, so ESM loaders (Node, Deno, Bun) can
+// detect the named exports of this CommonJS file without running it.
+const { immediate } = require('./lib/slice');
+const methods = require('./lib/methods');
+
+exports.immediate = immediate;
+exports.forEachPaced = methods.forEachPaced;
+exports.mapPaced = methods.mapPaced;
+exports.filterPaced = methods.filterPaced;
+exports.flatMapPaced = methods.flatMapPaced;
+exports.reducePaced = methods.reducePaced;
+exports.findPaced = methods.findPaced;
+exports.findIndexPaced = methods.findIndexPaced;
+exports.somePaced = methods.somePaced;
+exports.everyPaced = methods.everyPaced;

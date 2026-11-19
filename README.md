@@ -61,6 +61,21 @@ Await the promise from `immediate()` directly, as above. Wrapping it in another
 async function delays the caller by extra microtasks, and the slice can then
 overrun.
 
+## Runtimes
+
+| Runtime | Supported | Tested in CI |
+|---|---|---|
+| Node.js | 22 and later | 22, 24, 26 |
+| Deno | 2.9 and later | 2.9 LTS, latest 2.x |
+| Bun | 1.2 and later | 1.2.0, latest |
+
+Node 22 and Deno 2.9 are the oldest LTS releases that are still supported. Bun
+has no LTS. Both `require` and `import` work, including `paceifier/register`.
+
+On older runtimes (Node 18 and 20, Bun 1.0 and 1.1) everything works except the
+`register` methods on iterators, because those runtimes have no
+`Iterator.prototype`. `register` then skips them.
+
 ## How it works
 
 - Work runs in slices of about 1 ms. The first call to `immediate()` starts a
@@ -132,6 +147,7 @@ plain loop is faster there.
 | `npm test` | Runs the tests, including the execution snapshots |
 | `npm run test:update` | Runs the tests and rewrites the snapshots in `test/snapshots/` |
 | `npm run bench` | Benchmarks time, stalls and memory of `mapPaced` against a blocking `Array.map` |
+| `test/runtimes/run.sh <node\|deno\|bun>` | Packs the package, installs it in a temporary app and checks it with that runtime |
 | `npm run bench:compare [-- <ref>]` | Compares time and p99 stall of the working tree with a git ref, `main` by default |
 
 Each script in `test/scenarios/` runs paced work for real and records every step

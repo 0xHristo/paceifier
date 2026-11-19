@@ -134,65 +134,52 @@ plain loop is faster there.
 | `npm run bench` | Benchmarks time, stalls and memory of `mapPaced` against a blocking `Array.map` |
 | `npm run bench:compare [-- <ref>]` | Compares time and p99 stall of the working tree with a git ref, `main` by default |
 
-Each script in `test/scenarios/` runs paced work for real and prints every step
-in the order it ran, without times. Each line starts with the event-loop
-iteration it ran in (`#1` is the iteration the recording starts in), then says
-what ran it:
-
-| Prefix | Meaning |
-|---|---|
-| `io:` | an I/O callback; a chain of `fs.stat` calls runs alongside the jobs |
-| `immediate:` | a `setImmediate` callback, such as the one that ends a slice and resumes the next job |
-| `microtask:` | a job resumed in the same turn, because the job before it finished early |
-| `A:`, `B:`, … | the job's own work: start, items, pauses and completion. Items that ran back to back share a line, e.g. `A: items 0, 1` |
-
-`test/snapshots.test.js` runs every scenario in its own process and compares the
-output with `test/snapshots/<name>.txt`. For example, three `mapPaced` jobs of 4
-items each, run with `Promise.all`:
+Each script in `test/scenarios/` runs paced work for real and records every step
+in the order it ran: the event-loop iteration, the phase of the loop and what
+ran. `test/snapshots.test.js` runs every scenario in its own process and compares
+the result with `test/snapshots/<name>.txt`. For example, three `mapPaced` jobs
+of 4 items each, run with `Promise.all`:
 
 ```
-#1 A: start
-#1 A: items 0, 1
-#1 A: pause before item 2
-#1 B: start
-#1 B: pause before item 0
-#1 C: start
-#1 C: pause before item 0
-#2 io: callback
-#2 immediate: endSlice
-#2 immediate: resume A
-#2 A: items 2, 3
-#2 A: done
-#3 io: callback
-#3 immediate: endSlice
-#3 immediate: resume B
-#3 B: items 0, 1
-#3 B: pause before item 2
-#4 io: callback
-#4 immediate: endSlice
-#4 immediate: resume C
-#4 C: items 0, 1
-#4 C: pause before item 2
-#5 io: callback
-#5 immediate: endSlice
-#5 immediate: resume B
-#5 B: items 2, 3
-#5 B: done
-#6 io: callback
-#6 immediate: endSlice
-#6 immediate: resume C
-#6 C: items 2, 3
-#6 C: done
-#7 io: callback
-#7 immediate: endSlice
+loop  phase   step
+#1    timers  A: start
+#1    timers  A: items 0, 1
+#1    timers  A: pause before item 2
+#1    timers  B: start
+#1    timers  B: pause before item 0
+#1    timers  C: start
+#1    timers  C: pause before item 0
+#2    poll    io: callback
+#2    check   immediate: endSlice
+#2    check   immediate: resume A
+#2    check   A: items 2, 3
+#2    check   A: done
+#3    poll    io: callback
+#3    check   immediate: endSlice
+#3    check   immediate: resume B
+#3    check   B: items 0, 1
+#3    check   B: pause before item 2
+#4    poll    io: callback
+#4    check   immediate: endSlice
+#4    check   immediate: resume C
+#4    check   C: items 0, 1
+#4    check   C: pause before item 2
+#5    poll    io: callback
+#5    check   immediate: endSlice
+#5    check   immediate: resume B
+#5    check   B: items 2, 3
+#5    check   B: done
+#6    poll    io: callback
+#6    check   immediate: endSlice
+#6    check   immediate: resume C
+#6    check   C: items 2, 3
+#6    check   C: done
+#7    poll    io: callback
+#7    check   immediate: endSlice
 ```
 
-Items cost 0.67 ms, so a 1 ms slice fits 2 of them, with enough margin that real
-timing noise doesn't change the order. If the OS pauses the process at the wrong
-moment, an item can still land in the next slice, so the test retries a
-mismatching scenario up to 3 times before it fails. A job's `done` line can appear after
-other work, because it's printed by the code awaiting the job, which runs a few
-microtasks later.
+[test/snapshots/README.md](test/snapshots/README.md) explains every column and
+step.
 
 ## License
 

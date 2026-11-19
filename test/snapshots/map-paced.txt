@@ -1,15 +1,16 @@
-#1 A: start
-#1 A: items 0, 1
-#1 A: pause before item 2
-#2 io: callback
-#2 immediate: endSlice
-#2 immediate: resume A
-#2 A: items 2, 3
-#2 A: pause before item 4
-#3 io: callback
-#3 immediate: endSlice
-#3 immediate: resume A
-#3 A: items 4, 5
-#3 A: done
-#4 io: callback
-#4 immediate: endSlice
+loop  phase   step
+#1    timers  A: start
+#1    timers  A: items 0, 1
+#1    timers  A: pause before item 2
+#2    poll    io: callback
+#2    check   immediate: endSlice
+#2    check   immediate: resume A
+#2    check   A: items 2, 3
+#2    check   A: pause before item 4
+#3    poll    io: callback
+#3    check   immediate: endSlice
+#3    check   immediate: resume A
+#3    check   A: items 4, 5
+#3    check   A: done
+#4    poll    io: callback
+#4    check   immediate: endSlice

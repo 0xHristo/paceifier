@@ -1,4 +1,5 @@
-#1 A: start
-#1 A: items 0, 1, 2, 3, 4, 5
-#1 A: done
-#2 io: callback
+loop  phase   step
+#1    timers  A: start
+#1    timers  A: items 0, 1, 2, 3, 4, 5
+#1    timers  A: done
+#2    poll    io: callback

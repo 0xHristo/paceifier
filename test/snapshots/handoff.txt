@@ -1,20 +1,21 @@
-#1 A: start
-#1 A: items 0, 1
-#1 A: pause before item 2
-#1 B: start
-#1 B: pause before item 0
-#2 io: callback
-#2 immediate: endSlice
-#2 immediate: resume A
-#2 A: item 2
-#2 microtask: resume B
-#2 B: item 0
-#2 B: pause before item 1
-#2 A: done
-#3 io: callback
-#3 immediate: endSlice
-#3 immediate: resume B
-#3 B: items 1, 2
-#3 B: done
-#4 io: callback
-#4 immediate: endSlice
+loop  phase   step
+#1    timers  A: start
+#1    timers  A: items 0, 1
+#1    timers  A: pause before item 2
+#1    timers  B: start
+#1    timers  B: pause before item 0
+#2    poll    io: callback
+#2    check   immediate: endSlice
+#2    check   immediate: resume A
+#2    check   A: item 2
+#2    check   microtask: resume B
+#2    check   B: item 0
+#2    check   B: pause before item 1
+#2    check   A: done
+#3    poll    io: callback
+#3    check   immediate: endSlice
+#3    check   immediate: resume B
+#3    check   B: items 1, 2
+#3    check   B: done
+#4    poll    io: callback
+#4    check   immediate: endSlice

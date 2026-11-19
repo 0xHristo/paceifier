@@ -1,34 +1,35 @@
-#1 A: start
-#1 A: items 0, 1
-#1 A: pause before item 2
-#1 B: start
-#1 B: pause before item 0
-#1 C: start
-#1 C: pause before item 0
-#2 io: callback
-#2 immediate: endSlice
-#2 immediate: resume A
-#2 A: items 2, 3
-#2 A: done
-#3 io: callback
-#3 immediate: endSlice
-#3 immediate: resume B
-#3 B: items 0, 1
-#3 B: pause before item 2
-#4 io: callback
-#4 immediate: endSlice
-#4 immediate: resume C
-#4 C: items 0, 1
-#4 C: pause before item 2
-#5 io: callback
-#5 immediate: endSlice
-#5 immediate: resume B
-#5 B: items 2, 3
-#5 B: done
-#6 io: callback
-#6 immediate: endSlice
-#6 immediate: resume C
-#6 C: items 2, 3
-#6 C: done
-#7 io: callback
-#7 immediate: endSlice
+loop  phase   step
+#1    timers  A: start
+#1    timers  A: items 0, 1
+#1    timers  A: pause before item 2
+#1    timers  B: start
+#1    timers  B: pause before item 0
+#1    timers  C: start
+#1    timers  C: pause before item 0
+#2    poll    io: callback
+#2    check   immediate: endSlice
+#2    check   immediate: resume A
+#2    check   A: items 2, 3
+#2    check   A: done
+#3    poll    io: callback
+#3    check   immediate: endSlice
+#3    check   immediate: resume B
+#3    check   B: items 0, 1
+#3    check   B: pause before item 2
+#4    poll    io: callback
+#4    check   immediate: endSlice
+#4    check   immediate: resume C
+#4    check   C: items 0, 1
+#4    check   C: pause before item 2
+#5    poll    io: callback
+#5    check   immediate: endSlice
+#5    check   immediate: resume B
+#5    check   B: items 2, 3
+#5    check   B: done
+#6    poll    io: callback
+#6    check   immediate: endSlice
+#6    check   immediate: resume C
+#6    check   C: items 2, 3
+#6    check   C: done
+#7    poll    io: callback
+#7    check   immediate: endSlice

@@ -1,11 +1,7 @@
 'use strict';
-// Records the real order of execution of a scenario and prints it, one line per
-// step. Each line starts with the event-loop iteration it ran in (#1 is the
-// iteration the recording starts in), then what ran it:
-//   io:         an I/O callback (a real fs.stat chain runs alongside the jobs)
-//   immediate:  a setImmediate callback, such as the one that ends a slice
-//   microtask:  a job resumed in the same turn by the job before it
-//   <job>:      the job's own work, pauses and completion
+// Records the real order of execution of a scenario and prints it as a table:
+// the event-loop iteration, the phase of the loop, and the step that ran.
+// test/snapshots/README.md explains how to read it.
 // Nothing is faked. setImmediate is wrapped only to see which callback runs,
 // and the real one still does the scheduling. No times are printed, so the
 // output can be compared with a stored snapshot.
@@ -19,11 +15,13 @@ const timers = require('node:timers');
 const ITEM_MS = 0.67;
 let events = null; // null while warming up
 let loop = 0; // event-loop iteration of the recorded run
-const push = e => events?.push({ ...e, loop });
+let phase = 'timers'; // phase of the loop the current callback runs in
+const push = e => events?.push({ ...e, loop, phase });
 
 const realSetImmediate = timers.setImmediate;
 timers.setImmediate = (cb, ...args) =>
 	realSetImmediate(() => {
+		phase = 'check';
 		push({ kind: 'immediate', name: cb.name || 'callback' });
 		cb(...args);
 	});
@@ -56,6 +54,7 @@ function record(scenario) {
 				if (!running) return;
 				loop++;
 				ioThisLoop = true;
+				phase = 'poll';
 				push({ kind: 'io' });
 				io();
 			});
@@ -72,6 +71,7 @@ function record(scenario) {
 		await new Promise(r => setTimeout(r, 5));
 		events = [];
 		loop = 1;
+		phase = 'timers'; // the recording starts in the setTimeout callback above
 		ioThisLoop = true; // the ticker's next run is still in this iteration
 		await scenario(hooks);
 		// One more event-loop turn, so callbacks the jobs held back still show.
@@ -85,8 +85,8 @@ function record(scenario) {
 // "A: items 0, 1". Pauses and resumes are worked out from the order: a job that
 // started, or ran an item, and is followed by something else has paused.
 function format(events) {
-	const lines = [];
-	const add = (e, text) => lines.push(`#${e.loop} ${text}`);
+	const lines = ['loop  phase   step'];
+	const add = (e, text) => lines.push(`${`#${e.loop}`.padEnd(5)} ${e.phase.padEnd(7)} ${text}`);
 	const paused = new Set();
 	let lastWasEndSlice = false;
 	for (let i = 0; i < events.length; i++) {

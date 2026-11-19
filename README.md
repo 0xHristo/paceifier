@@ -53,14 +53,19 @@ for (const item of items) {
 }
 ```
 
+Await the promise from `immediate()` directly, as above. Wrapping it in another
+async function delays the caller by extra microtasks, and the slice can then
+overrun.
+
 ## How it works
 
 - A slice starts on the first call and schedules `endSlice` with `setImmediate`.
 - `endSlice` can only run once the caller stops running synchronously, so a slice
   ends exactly when the event loop gets a turn. Busy time is never mistaken for
   idle time.
-- Callers that run out of time queue up. Each loop turn resumes one of them in
-  order, so concurrent callers take turns.
+- Callers that run out of time queue up and resume in order, so concurrent
+  callers take turns. If a resumed caller finishes before its slice is used up,
+  the next waiting caller resumes in the same turn.
 - No promise is created while the slice has time left, so items that don't pause
   cost one `performance.now()` call.
 - Fake `setImmediate` implementations (Jest/Sinon timers) are skipped, so tests

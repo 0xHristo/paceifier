@@ -42,10 +42,10 @@ function turns() {
 	return () => (done = true);
 }
 
-async function run(mode) {
+async function run(mode, items = 8) {
 	await new Promise(r => realSetImmediate(r)); // let any old slice end
 	log.length = 0;
-	const jobs = [['H1', 8], ['H2', 8], ['H3', 8]];
+	const jobs = [['H1', items], ['H2', items], ['H3', items]];
 	const stop = turns();
 	if (mode === 'all') await Promise.all(jobs.map(([n, i]) => exportJob(n, i)));
 	else for (const [n, i] of jobs) await exportJob(n, i);
@@ -82,6 +82,22 @@ test('for loop: one job at a time, pausing every 1 ms', async () => {
 		...resume('H2'), 'H2: done',
 		'H3: pause before item 1',
 		...resume('H3'), 'H3: pause before item 5',
+		...resume('H3'), 'H3: done',
+	]);
+});
+
+test('a job that finishes mid-slice hands the rest of the slice to the next', async () => {
+	assert.deepStrictEqual(await run('all', 6), [
+		'turn',
+		'H1: pause before item 5',
+		'H2: pause before item 1',
+		'H3: pause before item 1',
+		// H1 needs only 0.5 ms more, so H2 resumes in the same turn.
+		...resume('H1'), 'H1: done',
+		'immediate: resume H2', 'H2: pause before item 3',
+		...resume('H3'), 'H3: pause before item 5',
+		// H2 uses its whole slice, so H3 waits for the next turn.
+		...resume('H2'), 'H2: done',
 		...resume('H3'), 'H3: done',
 	]);
 });

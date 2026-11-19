@@ -5,6 +5,48 @@ slices of about 1 ms, and between slices the Node.js event loop gets a turn to
 handle I/O and timers. A long job then holds up other work for about a
 millisecond at a time instead of for its whole duration.
 
+In short, paceifier caps how long synchronous code can stall the event loop.
+See [Usage](#usage) for examples and [How it works](#how-it-works) for the
+details.
+
+## Why
+
+Node.js runs JavaScript on a single thread. CPU-heavy work, like going through
+the rows of a large CSV or XML file or converting a big object, keeps that
+thread busy until it finishes. Meanwhile the process can't answer requests,
+read sockets or run timers, so every other task on the service waits.
+
+paceifier splits that one long block into slices. You run the work through a
+`…Paced` method, or call `immediate()` in your own loop and await it when it
+returns a promise. Each slice runs for about 1 ms, then the event loop gets a
+full turn to handle everything else that is waiting.
+
+The trade-off is that the job itself takes longer. How much longer depends on
+how much work each item does. With very cheap items, like `x * 2`, the job runs
+about 7 times slower. With items that take a few microseconds or more, it is
+only 2 to 5% slower (see [Performance](#performance)). In exchange, the service
+stays responsive and can keep handling other work while the job runs.
+
+### When to use it
+
+- Long loops on a server, where one job must not delay other requests.
+- Processing many items, such as CSV or XML rows, records from a database, or
+  entries of a large `Map`.
+- Building or transforming large objects piece by piece.
+
+### When not to use it
+
+- Short jobs that finish within a few milliseconds. They don't block for long,
+  and pacing only adds overhead.
+- Very cheap items in a hot loop, where the clock check costs more than the
+  work itself.
+- One call that can't be split, like a single `JSON.parse` of a huge string.
+  paceifier can only pause between items, not inside a call.
+- Work that needs the full CPU and must finish as fast as possible. Run it in a
+  [worker thread](https://nodejs.org/api/worker_threads.html) instead.
+
+## Usage
+
 ```js
 const { mapPaced, forEachPaced } = require('paceifier');
 

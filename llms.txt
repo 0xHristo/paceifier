@@ -1,0 +1,37 @@
+# paceifier
+
+> Paced versions of the standard collection methods for Node.js, Deno and Bun. A long synchronous loop runs in slices of about 1 ms, and the event loop gets a turn between slices, so I/O, timers and other requests keep running while the job works. Zero dependencies, CommonJS and ESM, TypeScript types included.
+
+Use it when a server runs a long CPU-bound loop over many items (CSV or XML rows, database records, entries of a large Map) and other requests must not wait for it. Don't use it for short jobs, for one call that can't be split (a single JSON.parse of a huge string), or for work that should finish as fast as possible on another core (use worker_threads).
+
+Install with `npm install paceifier`. Every method takes any iterable and a synchronous `fn(item, index)`, and returns a promise.
+
+```js
+const { mapPaced, forEachPaced, pace } = require('paceifier'); // or import { … } from 'paceifier'
+
+const lines = await mapPaced(rows, (row, index) => format(row));
+await forEachPaced(map.values(), entry => work(entry));
+
+// Low-level: pace() returns undefined while the slice has time left,
+// or a promise to await. Await it directly.
+for (const item of items) {
+	const pause = pace();
+	if (pause) await pause;
+	work(item);
+}
+```
+
+Methods: forEachPaced, mapPaced, filterPaced, flatMapPaced, reducePaced, findPaced, findIndexPaced, somePaced, everyPaced. They behave like the Array methods of the same name without the suffix. `require('paceifier/register')` adds them to Array.prototype and Iterator.prototype as non-enumerable methods, for example `await rows.mapPaced(format)`.
+
+Cost is about 75 ns per item plus a few microseconds per pause. With items of a few microseconds or more, a job is 2 to 5% slower than a blocking loop, and the event loop never waits much longer than 1 ms. Supported runtimes are Node.js 22+, Deno 2.9+ and Bun 1.2+.
+
+## Docs
+
+- [README](https://github.com/0xHristo/paceifier#readme): usage, when to use it, how it works, benchmarks and FAQ
+- [Type declarations with JSDoc](https://github.com/0xHristo/paceifier/blob/main/index.d.ts): every export with an example
+- [Execution snapshots](https://github.com/0xHristo/paceifier/blob/main/test/snapshots/README.md): the real order of execution across the event-loop phases
+
+## Optional
+
+- [AGENTS.md](https://github.com/0xHristo/paceifier/blob/main/AGENTS.md): how to work on the repository
+- [npm](https://www.npmjs.com/package/paceifier)

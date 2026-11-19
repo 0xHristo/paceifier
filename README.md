@@ -6,8 +6,8 @@ handle I/O and timers. A long job then holds up other work for about a
 millisecond at a time instead of for its whole duration.
 
 In short, paceifier caps how long synchronous code can stall the event loop.
-See [Usage](#usage) for examples and [How it works](#how-it-works) for the
-details.
+See [Usage](#usage) for examples, [How it works](#how-it-works) for the
+details and the [FAQ](#faq) for common questions.
 
 ## Why
 
@@ -278,6 +278,53 @@ shows that wrapping every item in a promise doesn't help either, next to
 [test/snapshots/map-paced-vs-promise-all-side-by-side.txt](test/snapshots/map-paced-vs-promise-all-side-by-side.txt)
 shows that `Promise.all(await mapPaced(values, async work))` runs in exactly the
 same order as `mapPaced(values, work)`.
+
+## FAQ
+
+### How do I stop a CPU-heavy loop from blocking other requests in Express or Fastify?
+
+Run the loop through a paced method and await it in the route handler. Other
+requests get a turn about every millisecond while it runs.
+
+```js
+app.get('/report', async (req, res) => {
+	const rows = await loadRows();
+	const lines = await mapPaced(rows, row => format(row));
+	res.send(lines.join('\n'));
+});
+```
+
+### How do I yield to the event loop inside a loop?
+
+Call `pace()` before each item and await the promise when it returns one. It
+only pauses once the current slice of about 1 ms is used up, so a short loop
+never pauses at all.
+
+### How is this different from chunking with `setImmediate`?
+
+Chunking by a fixed number of items pauses too often when items are cheap and
+too rarely when they are slow. paceifier pauses by time instead, so every slice
+lasts about 1 ms whatever the items cost. Concurrent jobs also take turns
+instead of all running in the same turn.
+
+### Why is the event loop lag of my service high during a job?
+
+A synchronous loop holds the thread until it ends, so the lag is as long as the
+job. With paceifier it stays around 1 to 2 ms, as the
+[stalls table](#performance) shows.
+
+### Should I use `worker_threads` instead?
+
+Use a worker thread when the job must finish as fast as possible, or when it is
+one call that can't be split. Use paceifier when the work is a loop over many
+items and you want to keep it on the main thread without copying data to a
+worker.
+
+### Does it work with Deno, Bun and TypeScript?
+
+Yes. See [Runtimes](#runtimes). Types ship with the package, and the paced
+methods keep the types of their callbacks, including type guards in
+`filterPaced` and `findPaced`.
 
 ## Background
 

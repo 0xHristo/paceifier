@@ -28,6 +28,7 @@
 		"index.d.ts",
 		"register.js",
 		"register.d.ts",
+		"llms.txt",
 		"lib"
 	],
 	"scripts": {
@@ -41,6 +42,11 @@
 	},
 	"keywords": [
 		"event-loop",
+		"event-loop-lag",
+		"yield",
+		"chunking",
+		"cpu-bound",
+		"express",
 		"non-blocking",
 		"blocking",
 		"cpu",

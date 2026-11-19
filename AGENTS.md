@@ -29,8 +29,8 @@ JavaScript with hand-written type declarations.
 ## Rules
 
 - Keep the public API in sync. A new or changed export needs `index.js`,
-  `index.d.ts` with JSDoc and an example, `register.d.ts`, the README table
-  and a test.
+  `index.d.ts` with JSDoc and an example, `register.d.ts`, the README table,
+  `llms.txt` and a test.
 - Assign each export on its own line in `index.js`, so ESM loaders can detect
   the named exports.
 - Callbacks are synchronous and get `(item, index)`. Every method takes any

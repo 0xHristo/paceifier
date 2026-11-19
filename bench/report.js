@@ -12,7 +12,7 @@ const label = r => `${r.name}, ${perItem(r)}`;
 const row = cells => cells.map(([v, w]) => String(v)[w < 0 ? 'padEnd' : 'padStart'](Math.abs(w))).join(' ');
 
 function print(results, runs) {
-	console.log(`node ${process.version}, median of ${runs} runs\n`);
+	console.log(`node ${process.version}, time and stalls are the median of ${runs} runs\n`);
 
 	console.log('TIME');
 	console.log(row([['callback, time per item', -26], ['items', 9], ['Array.map', 11], ['mapPaced', 11], ['slower', 8], ['overhead/item', 14]]));
@@ -24,7 +24,7 @@ function print(results, runs) {
 	}
 	const tb = results.reduce((sum, r) => sum + r.blocking.ms, 0);
 	const tp = results.reduce((sum, r) => sum + r.paced.ms, 0);
-	console.log(row([['total', -26], ['', 9], [`${n(tb)} ms`, 11], [`${n(tp)} ms`, 11], [`${n(((tp - tb) / tb) * 100, 0)}%`, 8], ['', 14]]));
+	console.log(row([['all five', -26], ['', 9], [`${n(tb)} ms`, 11], [`${n(tp)} ms`, 11], [`${n(((tp - tb) / tb) * 100, 0)}%`, 8], ['', 14]]));
 
 	console.log('\nSTALLS (gaps between event-loop turns while the job runs)');
 	console.log(row([['callback, time per item', -26], ['Array.map max', 14], ['mapPaced p50', 13], ['p99', 9], ['max', 9], ['turns', 7]]));

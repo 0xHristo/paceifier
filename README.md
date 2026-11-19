@@ -141,36 +141,43 @@ On older runtimes (Node 18 and 20, Bun 1.0 and 1.1) everything works except the
 
 ## Performance
 
-Measured with `npm run bench` (Node 26.3, median of 7 runs). Each row runs the
-same callback over an array, once with a blocking `Array.map` and once with
-`mapPaced`. The callbacks go from a single multiplication to a loop that takes
-longer than half a slice, and the second column shows how long one call takes.
+Measured with `npm run bench` (Node 26.3). Time and stalls are the median of 7
+runs each. Each row runs the same callback over an array, once with a blocking
+`Array.map` and once with `mapPaced`. The callbacks go from a single
+multiplication to a loop that takes longer than half a slice, and the second
+column shows how long one call takes.
 
 **Time.** Pacing adds about 75 ns per item, mostly one `performance.now()` call,
 plus a few microseconds per pause.
 
 | Callback | Time per item | Items | `Array.map` | `mapPaced` | Slower |
 |---|---|---|---|---|---|
-| `x * 2` | 11 ns | 1,000,000 | 11.4 ms | 82.8 ms | 627% |
-| 100-step loop | 0.4 µs | 500,000 | 204.3 ms | 242.7 ms | 19% |
-| 1k-step loop | 4.2 µs | 100,000 | 421.3 ms | 441.1 ms | 5% |
-| 10k-step loop | 42 µs | 10,000 | 421.0 ms | 428.4 ms | 2% |
-| 150k-step loop | 0.59 ms | 500 | 296.6 ms | 302.6 ms | 2% |
-| **total** | | | 1354.6 ms | 1497.7 ms | 11% |
+| `x * 2` | 11 ns | 1,000,000 | 11.0 ms | 82.6 ms | 649% |
+| 100-step loop | 0.4 µs | 500,000 | 206.7 ms | 248.4 ms | 20% |
+| 1k-step loop | 4.2 µs | 100,000 | 422.3 ms | 438.3 ms | 4% |
+| 10k-step loop | 42 µs | 10,000 | 418.7 ms | 427.5 ms | 2% |
+| 150k-step loop | 0.59 ms | 500 | 296.8 ms | 308.6 ms | 4% |
+| **all five** | | | 1355.5 ms | 1505.4 ms | 11% |
+
+The last row adds up the five runs. Its percentage depends on which callbacks the
+benchmark happens to include, so read the rows above it for a real workload.
 
 **Stalls.** How long the event loop had to wait for a turn while the job ran.
+`Array.map` never gives the loop a turn, so its whole run is one stall.
 
 | Callback | Time per item | `Array.map` | `mapPaced` p50 | p99 | max |
 |---|---|---|---|---|---|
-| `x * 2` | 11 ns | 11.1 ms | 1.02 ms | 6.23 ms | 6.23 ms |
-| 100-step loop | 0.4 µs | 202.4 ms | 1.02 ms | 1.21 ms | 1.57 ms |
-| 1k-step loop | 4.2 µs | 419.2 ms | 1.02 ms | 1.08 ms | 1.86 ms |
-| 10k-step loop | 42 µs | 420.6 ms | 1.03 ms | 1.08 ms | 1.35 ms |
-| 150k-step loop | 0.59 ms | 298.0 ms | 1.20 ms | 1.42 ms | 1.63 ms |
+| `x * 2` | 11 ns | 10.0 ms | 1.02 ms | 6.02 ms | 6.02 ms |
+| 100-step loop | 0.4 µs | 209.9 ms | 1.02 ms | 1.37 ms | 1.74 ms |
+| 1k-step loop | 4.2 µs | 421.8 ms | 1.02 ms | 1.06 ms | 1.65 ms |
+| 10k-step loop | 42 µs | 419.2 ms | 1.03 ms | 1.08 ms | 1.50 ms |
+| 150k-step loop | 0.59 ms | 300.3 ms | 1.23 ms | 1.50 ms | 1.60 ms |
 
 The time is checked before each item, so a slice can run over 1 ms by up to one
-item. With 0.59 ms items, the worst stall is therefore about 1.6 ms. Rare longer
-stalls, like the 6 ms with `x * 2`, come from garbage collection.
+item. With 0.59 ms items, the worst stall is therefore about 1.6 ms. The 6 ms with
+`x * 2` shows up in every run, not only the first. It comes from garbage
+collection while the 1,000,000-item result array fills up, and the same job
+without a result array stays under about 2 ms.
 
 **Memory.** For 1,000,000 items, the result of `mapPaced` keeps 9.9 MB against
 7.6 MB for `Array.map`, because it grows its result array with `push` instead of

@@ -1,7 +1,8 @@
 'use strict';
 // mapPaced against a blocking Array.map doing the same work. Real timing on a
-// quiet event loop, median of RUNS runs after a warm-up, then one extra run each
-// for stalls and one for memory.
+// quiet event loop. Time and stalls are the median of RUNS runs each after a
+// warm-up, so one run with a rare GC pause doesn't decide the result. Memory
+// comes from one extra run.
 // Usage: node --expose-gc bench/overhead.js [--json]
 // PACEIFIER=<dir> benchmarks another copy of the library (used by compare.js).
 const path = require('node:path');
@@ -32,7 +33,14 @@ async function measure(run) {
 	await time(run); // warm-up
 	const times = [];
 	for (let r = 0; r < RUNS; r++) times.push(await time(run));
-	return { ms: median(times), stalls: await stalls(run), memory: await memory(run) };
+	const runs = [];
+	for (let r = 0; r < RUNS; r++) runs.push(await stalls(run));
+	const stall = key => median(runs.map(s => s[key]));
+	return {
+		ms: median(times),
+		stalls: { turns: stall('turns'), p50: stall('p50'), p99: stall('p99'), max: stall('max') },
+		memory: await memory(run),
+	};
 }
 
 (async () => {

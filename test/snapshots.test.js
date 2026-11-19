@@ -28,7 +28,8 @@ const run = name => execFileSync(process.execPath, [path.join(SCENARIOS, `${name
 for (const name of scenarios) {
 	test(`scenario ${name} matches its snapshot`, () => {
 		const file = path.join(SNAPSHOTS, `${name}.txt`);
-		if (UPDATE || !fs.existsSync(file)) {
+		if (!UPDATE && !fs.existsSync(file)) assert.fail(`${file} is missing. Create it with npm run test:update`);
+		if (UPDATE) {
 			fs.mkdirSync(SNAPSHOTS, { recursive: true });
 			fs.writeFileSync(file, run(name));
 			return;
@@ -67,7 +68,8 @@ for (const c of COMPARISONS) {
 		const read = name => fs.readFileSync(path.join(SNAPSHOTS, `${name}.txt`), 'utf8');
 		const actual = sideBySide(c.left[0], read(c.left[1]), c.right[0], read(c.right[1]));
 		const file = path.join(SNAPSHOTS, `${c.name}.txt`);
-		if (UPDATE || !fs.existsSync(file)) return fs.writeFileSync(file, actual);
+		if (UPDATE) return fs.writeFileSync(file, actual);
+		if (!fs.existsSync(file)) assert.fail(`${file} is missing. Create it with npm run test:update`);
 		assert.strictEqual(actual, fs.readFileSync(file, 'utf8'));
 	});
 }

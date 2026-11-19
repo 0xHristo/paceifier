@@ -53,7 +53,7 @@ try {
 	const total = side => median(runs[side].map(x => x.reduce((sum, w) => sum + w.paced.ms, 0)));
 	const tb = total('base');
 	const th = total('head');
-	console.log(`${'total'.padEnd(20)} ${tb.toFixed(1).padStart(6)} ms ${th.toFixed(1).padStart(7)} ms ${change(tb, th).padStart(8)}`);
+	console.log(`${'all five'.padEnd(20)} ${tb.toFixed(1).padStart(6)} ms ${th.toFixed(1).padStart(7)} ms ${change(tb, th).padStart(8)}`);
 	console.log(`\ncomparison took ${((performance.now() - started) / 1000).toFixed(1)} s`);
 } finally {
 	git('worktree', 'remove', '--force', base);

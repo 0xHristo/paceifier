@@ -1,5 +1,5 @@
 {
-	"name": "pacifier",
+	"name": "paceifier",
 	"version": "0.1.0-alpha.0",
 	"description": "Run long sequential work in short slices so it never blocks the event loop",
 	"author": "hristoht",

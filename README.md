@@ -1,10 +1,10 @@
-# pacifier
+# paceifier
 
 Paced versions of the standard collection methods. Long sequential work runs in
 1 ms slices, so it never blocks the Node.js event loop.
 
 ```js
-const { mapPaced, forEachPaced } = require('pacifier');
+const { mapPaced, forEachPaced } = require('paceifier');
 
 const lines = await mapPaced(bigArray, (item, index) => format(item));
 await forEachPaced(map.values(), entry => work(entry));
@@ -13,7 +13,7 @@ await forEachPaced(map.values(), entry => work(entry));
 Or opt in to methods on arrays and iterators:
 
 ```js
-require('pacifier/register');
+require('paceifier/register');
 
 const lines = await bigArray.mapPaced(item => format(item));
 await map.values().forEachPaced(entry => work(entry));
@@ -38,7 +38,7 @@ synchronous `fn(item, index)`, and returns a promise.
 
 If `fn` throws, the promise rejects.
 
-`require('pacifier/register')` adds the same methods (without the `items`
+`require('paceifier/register')` adds the same methods (without the `items`
 argument) to `Array.prototype` and `Iterator.prototype` (Node 22+). They are
 non-enumerable and only added where they don't already exist.
 

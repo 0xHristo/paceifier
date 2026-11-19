@@ -49,6 +49,7 @@ JavaScript with hand-written type declarations.
 
 - Tabs for indentation, single quotes, `'use strict'` at the top of every file.
 - Require Node built-ins with the `node:` prefix.
+- Give every `if`, `else` and loop a block with braces, even for one statement.
 - Start each file with a short comment on what it does, and name tests as
   sentences that describe the behaviour.
 - In docs and comments, write short sentences and don't put a colon in the

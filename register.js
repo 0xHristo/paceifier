@@ -5,9 +5,13 @@
 const methods = require('./lib/methods');
 
 for (const proto of [Array.prototype, globalThis.Iterator?.prototype]) {
-	if (!proto) continue;
+	if (!proto) {
+		continue;
+	}
 	for (const [name, fn] of Object.entries(methods)) {
-		if (Object.prototype.hasOwnProperty.call(proto, name)) continue;
+		if (Object.prototype.hasOwnProperty.call(proto, name)) {
+			continue;
+		}
 		Object.defineProperty(proto, name, {
 			value: function (...args) {
 				return fn(this, ...args);

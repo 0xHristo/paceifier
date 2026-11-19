@@ -1,16 +1,24 @@
-loop  phase   step
-#1    timers  A: start
-#1    timers  A: items 0, 1
-#1    timers  A: pause before item 2
-#2    poll    io: callback
-#2    check   immediate: endSlice
-#2    check   immediate: resume A
-#2    check   A: items 2, 3
-#2    check   A: pause before item 4
-#3    poll    io: callback
-#3    check   immediate: endSlice
-#3    check   immediate: resume A
-#3    check   A: items 4, 5
-#3    check   A: done
-#4    poll    io: callback
-#4    check   immediate: endSlice
+loop  phase    step
+#1    timers   A: start
+#1    timers   A: items 0, 1
+#1    timers   A: pause before item 2
+#1    timers   timeout: callback
+#1    pending  socket: connect error
+#1    poll     io: callback
+#1    poll     nextTick: callback
+#1    poll     microtask: callback
+#1    check    immediate: endSlice
+#1    check    immediate: resume A
+#1    check    A: items 2, 3
+#1    check    A: pause before item 4
+#1    close    socket: closed
+#2    timers   timeout: callback
+#2    pending  socket: connect error
+#2    poll     io: callback
+#2    poll     nextTick: callback
+#2    poll     microtask: callback
+#2    check    immediate: endSlice
+#2    check    immediate: resume A
+#2    check    A: items 4, 5
+#2    check    A: done
+#2    close    socket: closed

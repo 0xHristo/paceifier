@@ -1,5 +1,10 @@
-loop  phase   step
-#1    timers  A: start
-#1    timers  A: items 0, 1, 2, 3, 4, 5
-#1    timers  A: done
-#2    poll    io: callback
+loop  phase    step
+#1    timers   A: start
+#1    timers   A: items 0, 1, 2, 3, 4, 5
+#1    timers   A: done
+#1    timers   timeout: callback
+#1    pending  socket: connect error
+#1    poll     io: callback
+#1    poll     nextTick: callback
+#1    poll     microtask: callback
+#1    close    socket: closed

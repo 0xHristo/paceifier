@@ -1,35 +1,58 @@
-loop  phase   step
-#1    timers  A: start
-#1    timers  A: items 0, 1
-#1    timers  A: pause before item 2
-#1    timers  B: start
-#1    timers  B: pause before item 0
-#1    timers  C: start
-#1    timers  C: pause before item 0
-#2    poll    io: callback
-#2    check   immediate: endSlice
-#2    check   immediate: resume A
-#2    check   A: items 2, 3
-#2    check   A: done
-#3    poll    io: callback
-#3    check   immediate: endSlice
-#3    check   immediate: resume B
-#3    check   B: items 0, 1
-#3    check   B: pause before item 2
-#4    poll    io: callback
-#4    check   immediate: endSlice
-#4    check   immediate: resume C
-#4    check   C: items 0, 1
-#4    check   C: pause before item 2
-#5    poll    io: callback
-#5    check   immediate: endSlice
-#5    check   immediate: resume B
-#5    check   B: items 2, 3
-#5    check   B: done
-#6    poll    io: callback
-#6    check   immediate: endSlice
-#6    check   immediate: resume C
-#6    check   C: items 2, 3
-#6    check   C: done
-#7    poll    io: callback
-#7    check   immediate: endSlice
+loop  phase    step
+#1    timers   A: start
+#1    timers   A: items 0, 1
+#1    timers   A: pause before item 2
+#1    timers   B: start
+#1    timers   B: pause before item 0
+#1    timers   C: start
+#1    timers   C: pause before item 0
+#1    timers   timeout: callback
+#1    pending  socket: connect error
+#1    poll     io: callback
+#1    poll     nextTick: callback
+#1    poll     microtask: callback
+#1    check    immediate: endSlice
+#1    check    immediate: resume A
+#1    check    A: items 2, 3
+#1    check    A: done
+#1    close    socket: closed
+#2    timers   timeout: callback
+#2    pending  socket: connect error
+#2    poll     io: callback
+#2    poll     nextTick: callback
+#2    poll     microtask: callback
+#2    check    immediate: endSlice
+#2    check    immediate: resume B
+#2    check    B: items 0, 1
+#2    check    B: pause before item 2
+#2    close    socket: closed
+#3    timers   timeout: callback
+#3    pending  socket: connect error
+#3    poll     io: callback
+#3    poll     nextTick: callback
+#3    poll     microtask: callback
+#3    check    immediate: endSlice
+#3    check    immediate: resume C
+#3    check    C: items 0, 1
+#3    check    C: pause before item 2
+#3    close    socket: closed
+#4    timers   timeout: callback
+#4    pending  socket: connect error
+#4    poll     io: callback
+#4    poll     nextTick: callback
+#4    poll     microtask: callback
+#4    check    immediate: endSlice
+#4    check    immediate: resume B
+#4    check    B: items 2, 3
+#4    check    B: done
+#4    close    socket: closed
+#5    timers   timeout: callback
+#5    pending  socket: connect error
+#5    poll     io: callback
+#5    poll     nextTick: callback
+#5    poll     microtask: callback
+#5    check    immediate: endSlice
+#5    check    immediate: resume C
+#5    check    C: items 2, 3
+#5    check    C: done
+#5    close    socket: closed

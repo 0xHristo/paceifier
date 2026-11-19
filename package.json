@@ -1,16 +1,36 @@
 {
 	"name": "paced",
-	"version": "0.1.0",
+	"version": "0.1.0-alpha.0",
 	"description": "Run long sequential work in short slices so it never blocks the event loop",
+	"author": "hristoht",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/0xHristo/paced.git"
+	},
+	"homepage": "https://github.com/0xHristo/paced#readme",
+	"bugs": "https://github.com/0xHristo/paced/issues",
 	"main": "index.js",
 	"types": "index.d.ts",
-	"files": ["index.js", "index.d.ts", "register.js", "register.d.ts", "lib"],
+	"files": [
+		"index.js",
+		"index.d.ts",
+		"register.js",
+		"register.d.ts",
+		"lib"
+	],
 	"scripts": {
 		"test": "node --test"
 	},
 	"engines": {
 		"node": ">=18"
 	},
-	"keywords": ["paced", "event-loop", "non-blocking", "yield", "setImmediate", "chunk"],
+	"keywords": [
+		"paced",
+		"event-loop",
+		"non-blocking",
+		"yield",
+		"setImmediate",
+		"chunk"
+	],
 	"license": "Apache-2.0"
 }
